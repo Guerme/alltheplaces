@@ -22,4 +22,6 @@ class UbitricitySpider(Spider):
                 [location["address"].pop("street"), location["address"].pop("street2")]
             )
             location["ref"] = location["ssoId"]
+            #TODO Add category mapping
+
             yield DictParser.parse(location)
