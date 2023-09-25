@@ -1,8 +1,8 @@
 from scrapy import Spider
 from scrapy.http import JsonRequest
 
-from locations.dict_parser import DictParser
 from locations.categories import apply_category
+from locations.dict_parser import DictParser
 from locations.spiders.vapestore_gb import clean_address
 
 
@@ -16,10 +16,6 @@ class UbitricitySpider(Spider):
             headers={"X-API-TOKEN": "WEB_1049d590-d150-4f39-8240-3484a64dcc4c"},
         )
 
-
-
-
-
     def parse(self, response, **kwargs):
         for location in response.json():
             location["location"] = location["address"].pop("location")
@@ -30,7 +26,7 @@ class UbitricitySpider(Spider):
 
             item = DictParser.parse(location)
 
-            apply_category({"amenity": 'charging_station'}, item)
+            apply_category({"amenity": "charging_station"}, item)
 
             DictParser.parse(location)
 
