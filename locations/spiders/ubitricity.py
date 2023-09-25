@@ -2,6 +2,7 @@ from scrapy import Spider
 from scrapy.http import JsonRequest
 
 from locations.dict_parser import DictParser
+from locations.categories import apply_category
 from locations.spiders.vapestore_gb import clean_address
 
 
@@ -22,6 +23,11 @@ class UbitricitySpider(Spider):
                 [location["address"].pop("street"), location["address"].pop("street2")]
             )
             location["ref"] = location["ssoId"]
-            #TODO Add category mapping
 
-            yield DictParser.parse(location)
+            item = DictParser.parse(location)
+
+            apply_category({"amenity": 'charging_station'}, item)
+
+            DictParser.parse(location)
+
+            yield item
