@@ -16,6 +16,10 @@ class UbitricitySpider(Spider):
             headers={"X-API-TOKEN": "WEB_1049d590-d150-4f39-8240-3484a64dcc4c"},
         )
 
+
+
+
+
     def parse(self, response, **kwargs):
         for location in response.json():
             location["location"] = location["address"].pop("location")
