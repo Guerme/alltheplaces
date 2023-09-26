@@ -14,13 +14,7 @@ class MarshallsSpider(scrapy.Spider):
     name = "marshalls"
     allowed_domains = ["tjx.com"]
 
-    chains = {
-        "08": "TJ Maxx",
-        "10": "Marshalls",
-        "28": "Homegoods",
-        "29": "Homesense",
-        "50": "Sierra",
-    }
+    item_attributes = {"brand": "Marshalls", "brand_wikidata": "Q15903261"}
 
     def start_requests(self):
         url = "https://marketingsl.tjx.com/storelocator/GetSearchResults"
@@ -92,7 +86,6 @@ class MarshallsSpider(scrapy.Spider):
                 "phone": store["Phone"],
                 "lat": float(store["Latitude"]),
                 "lon": float(store["Longitude"]),
-                "brand": self.chains[store["Chain"]],
             }
 
             hours = self.parse_hours(store["Hours"])
