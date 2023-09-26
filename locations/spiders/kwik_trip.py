@@ -1,5 +1,6 @@
 import scrapy
 
+from locations.categories import Categories, apply_category
 from locations.items import Feature
 from locations.user_agents import BROWSER_DEFAULT
 
@@ -29,5 +30,7 @@ class KwikTripSpider(scrapy.Spider):
                 "phone": row.xpath('.//td[@class="column-7"]/text()').extract_first(),
                 "website": response.url,
             }
+            
+            apply_category(Categories.FUEL_STATION, properties)
 
             yield Feature(**properties)
