@@ -6,6 +6,7 @@ import scrapy
 from locations.hours import OpeningHours
 from locations.items import Feature
 from locations.searchable_points import open_searchable_points
+from locations.geo import point_locations
 
 DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -29,24 +30,21 @@ class TjmaxxSpider(scrapy.Spider):
         "50": "Q16844433",
     }
 
+    brand_chains = {"08": {"brand": "TJ Maxx", "Qcode": "Q10860683"}}
+
     def start_requests(self):
-        url = "https://marketingsl.tjx.com/storelocator/GetSearchResults"
-        payload = {"chain": "08", "lang": "en", "maxstores": "100"}
-
-        with open_searchable_points("us_centroids_100mile_radius.csv") as points:
-            reader = csv.DictReader(points)
-            for point in reader:
-                payload.update({"geolat": point["latitude"], "geolong": point["longitude"]})
-
-                yield scrapy.http.FormRequest(
-                    url=url,
-                    method="POST",
-                    formdata=payload,
-                    headers={
-                        "Content-Type": "application/x-www-form-urlencoded",
-                        "Accept": "application/json",
-                    },
-                )
+        for lat, lon in point_locations("us_centroids_100mile_radius.csv"):
+            yield scrapy.http.FormRequest(
+                url="https://marketingsl.tjx.com/storelocator/GetSearchResults",
+                formdata={
+                    "chain": "08",
+                    "lang": "en",
+                    "maxstores": "100",
+                    "geolat": lat,
+                    "geolong": lon,
+                },
+                headers={"Accept": "application/json"},
+            )
 
     def parse_hours(self, hours):
         try:
