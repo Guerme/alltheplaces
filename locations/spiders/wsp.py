@@ -2,6 +2,7 @@ import json
 
 import scrapy
 
+from locations.categories import Categories, apply_category
 from locations.items import Feature
 
 
@@ -38,6 +39,9 @@ class WSPSpider(scrapy.Spider):
                     "name": office["Name"],
                     "website": response.urljoin(office["MapPointURL"]),
                 }
+
+                apply_category({"office": "engineer"}, properties)
+
             except IndexError:
                 continue
 
