@@ -1,12 +1,10 @@
-import csv
 import datetime
 
 import scrapy
 
+from locations.geo import point_locations
 from locations.hours import OpeningHours
 from locations.items import Feature
-from locations.searchable_points import open_searchable_points
-from locations.geo import point_locations
 
 DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -14,6 +12,7 @@ DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 class TjmaxxSpider(scrapy.Spider):
     name = "tjmaxx"
     allowed_domains = ["tjx.com"]
+    no_refs = True
 
     chains = {
         "08": "TJ Maxx",
@@ -33,11 +32,12 @@ class TjmaxxSpider(scrapy.Spider):
     brand_chains = {"08": {"brand": "TJ Maxx", "Qcode": "Q10860683"}}
 
     def start_requests(self):
-        for lat, lon in point_locations("us_centroids_100mile_radius.csv"):
+        # for chain in self.chains:
+        for lat, lon in point_locations("us_centroids_50mile_radius.csv"):
             yield scrapy.http.FormRequest(
                 url="https://marketingsl.tjx.com/storelocator/GetSearchResults",
                 formdata={
-                    "chain": "08",
+                    "chain": "08,10,28,29,50",
                     "lang": "en",
                     "maxstores": "100",
                     "geolat": lat,
@@ -88,7 +88,6 @@ class TjmaxxSpider(scrapy.Spider):
         for store in data["Stores"]:
             properties = {
                 "name": store["Name"],
-                "ref": store["StoreID"],
                 "addr_full": store["Address"].strip(),
                 "city": store["City"],
                 "state": store["State"],
