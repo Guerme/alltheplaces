@@ -12,7 +12,6 @@ DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 class TjmaxxSpider(scrapy.Spider):
     name = "tjmaxx"
     allowed_domains = ["tjx.com"]
-    no_refs = True
 
     chains = {
         "08": "TJ Maxx",
@@ -29,15 +28,20 @@ class TjmaxxSpider(scrapy.Spider):
         "50": "Q16844433",
     }
 
-    brand_chains = {"08": {"brand": "TJ Maxx", "Qcode": "Q10860683"}}
+    brand_chains_us = {"08": {"brand": "TJ Maxx", "Qcode": "Q10860683"},
+                    "10": {"brand": "Marshalls", "Qcode": "Q15903261"},
+                    "28": {"brand": "Home Goods", "Qcode": "Q5887941"},
+                    "29": {"brand": "Sierra", "Qcode": "Q7511598"},
+                    "50": {"brand": "Home Sense", "Qcode": "Q16844433"}}
 
     def start_requests(self):
-        # for chain in self.chains:
+        chains = str([k for k in self.brand_chains.keys()]).replace('[','"').replace(']','"').replace(' ','').replace("'","")
+        self.logger.info(chains)
         for lat, lon in point_locations("us_centroids_50mile_radius.csv"):
             yield scrapy.http.FormRequest(
                 url="https://marketingsl.tjx.com/storelocator/GetSearchResults",
                 formdata={
-                    "chain": "08,10,28,29,50",
+                    "chain": chains,
                     "lang": "en",
                     "maxstores": "100",
                     "geolat": lat,
@@ -88,6 +92,7 @@ class TjmaxxSpider(scrapy.Spider):
         for store in data["Stores"]:
             properties = {
                 "name": store["Name"],
+                "ref": f'{store["Chain"]}{store["StoreID"]}',
                 "addr_full": store["Address"].strip(),
                 "city": store["City"],
                 "state": store["State"],
@@ -96,8 +101,8 @@ class TjmaxxSpider(scrapy.Spider):
                 "phone": store["Phone"],
                 "lat": float(store["Latitude"]),
                 "lon": float(store["Longitude"]),
-                "brand": self.chains[store["Chain"]],
-                "brand_wikidata": self.wikidata[store["Chain"]],
+                "brand": self.brand_chains_us.get(store["Chain"], {}).get("brand"),
+                "brand_wikidata": self.brand_chains_us.get(store["Chain"], {}).get("Qcode"),
             }
 
             hours = self.parse_hours(store["Hours"])
