@@ -3,8 +3,9 @@ import datetime
 import scrapy
 
 from locations.geo import point_locations
-from locations.hours import OpeningHours, DAYS
+from locations.hours import DAYS, OpeningHours
 from locations.items import Feature
+
 
 class TjmaxxSpider(scrapy.Spider):
     name = "tjmaxx"
