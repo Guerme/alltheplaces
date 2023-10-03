@@ -40,4 +40,3 @@ class SevenElevenUSSpider(scrapy.Spider):
             )
             apply_category(Categories.SHOP_CONVENIENCE, item)
             yield item
-
