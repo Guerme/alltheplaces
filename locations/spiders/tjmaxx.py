@@ -13,33 +13,22 @@ class TjmaxxSpider(scrapy.Spider):
     name = "tjmaxx"
     allowed_domains = ["tjx.com"]
 
-    brand_chains_us = {
+    chains = {
+        # USA chains
         "08": {"brand": "TJ Maxx", "brand_wikidata": "Q10860683"},
         "10": {"brand": "Marshalls", "brand_wikidata": "Q15903261"},
-        "28": {"brand": "Home Goods", "brand_wikidata": "Q5887941"},
-        "29": {"brand": "Sierra", "brand_wikidata": "Q7511598"},
-        "50": {"brand": "Home Sense", "brand_wikidata": "Q16844433"},
-    }
-
-    brand_chains_ca = {
+        # Canada chains
         "90": {"brand": "HomeSense", "brand_wikidata": "Q16844433"},
         "91": {"brand": "Winners", "brand_wikidata": "Q845257"},
         "93": {"brand": "Marshalls", "brand_wikidata": "Q15903261"},
     }
 
     def start_requests(self):
-        chains_us = (
-            str([k for k in self.brand_chains_us.keys()])
-            .replace("[", '"')
-            .replace("]", '"')
-            .replace(" ", "")
-            .replace("'", "")
-        )
         for lat, lon in point_locations("us_centroids_50mile_radius.csv"):
             yield scrapy.http.FormRequest(
                 url="https://marketingsl.tjx.com/storelocator/GetSearchResults",
                 formdata={
-                    "chain": chains_us,
+                    "chain": "08,10",
                     "lang": "en",
                     "maxstores": "100",
                     "geolat": lat,
@@ -48,18 +37,11 @@ class TjmaxxSpider(scrapy.Spider):
                 headers={"Accept": "application/json"},
             )
 
-        chains_ca = (
-            str([k for k in self.brand_chains_ca.keys()])
-                .replace("[", '"')
-                .replace("]", '"')
-                .replace(" ", "")
-                .replace("'", "")
-        )
-        for lat, lon in point_locations("ca_centroids_50mile_radius.csv"):
+        for lat, lon in point_locations("ca_centroids_100mile_radius.csv"):
             yield scrapy.http.FormRequest(
                 url="https://marketingsl.tjx.com/storelocator/GetSearchResults",
                 formdata={
-                    "chain": chains_ca,
+                    "chain": "90,91,93",
                     "lang": "en",
                     "maxstores": "100",
                     "geolat": lat,
@@ -119,8 +101,8 @@ class TjmaxxSpider(scrapy.Spider):
                 "phone": store["Phone"],
                 "lat": float(store["Latitude"]),
                 "lon": float(store["Longitude"]),
-                "brand": self.brand_chains_us.get(store["Chain"], {}).get("brand"),
-                "brand_wikidata": self.brand_chains_us.get(store["Chain"], {}).get("brand_wikidata"),
+                "brand": self.chains.get(store["Chain"], {}).get("brand"),
+                "brand_wikidata": self.chains.get(store["Chain"], {}).get("brand_wikidata"),
             }
 
             hours = self.parse_hours(store["Hours"])

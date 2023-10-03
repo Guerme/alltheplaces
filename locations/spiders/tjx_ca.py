@@ -34,6 +34,9 @@ class TjxCASpider(scrapy.Spider):
             )
 
     def parse_hours(self, hours):
+        if hours is None:
+            return
+
         """Mon-Thu: 9am - 9pm, Black Friday: 8am - 10pm, Sat: 9am - 9pm, Sun: 10am - 8pm"""
         opening_hours = OpeningHours()
         hours = hours.replace("Black Friday", "Fri")
