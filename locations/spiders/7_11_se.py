@@ -1,5 +1,6 @@
 import scrapy
 
+from locations.categories import Categories, apply_category
 from locations.hours import DAYS, OpeningHours
 from locations.items import Feature
 
@@ -22,7 +23,7 @@ class SevenElevenUSSpider(scrapy.Spider):
                     close_time=close,
                     time_format="%H:%M",
                 )
-            yield Feature(
+            item = Feature(
                 {
                     "ref": store.get("storeId"),
                     "name": store.get("title"),
@@ -37,3 +38,6 @@ class SevenElevenUSSpider(scrapy.Spider):
                     "opening_hours": oh,
                 }
             )
+            apply_category(Categories.SHOP_CONVENIENCE, item)
+            yield item
+
