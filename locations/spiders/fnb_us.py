@@ -1,5 +1,6 @@
 import scrapy
 
+from locations.categories import Categories, apply_category
 from locations.linked_data_parser import LinkedDataParser
 from locations.microdata_parser import MicrodataParser
 
@@ -21,4 +22,5 @@ class FnbUSSpider(scrapy.spiders.SitemapSpider):
         MicrodataParser.convert_to_json_ld(response)
         item = LinkedDataParser.parse(response, "BankOrCreditUnion")
         item["country"] = "US"
+        apply_category(Categories.BANK, item)
         yield item
