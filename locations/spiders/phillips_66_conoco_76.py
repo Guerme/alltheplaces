@@ -16,9 +16,8 @@ class Phillips66Conoco76Spider(scrapy.Spider):
     )
 
     BRANDS = {
-        # TODO: Disabled NSI look up on U76 until matching improves
-        "76": {"brand": "U76", "brand_wikidata": "Q1658320", "nsi_id": "N/A"},
-        "U76": {"brand": "U76", "brand_wikidata": "Q1658320", "nsi_id": "N/A"},
+        "76": {"brand": "76", "brand_wikidata": "Q1658320"},
+        "U76": {"brand": "76", "brand_wikidata": "Q1658320"},
         "CON": {"brand": "Conoco", "brand_wikidata": "Q109341187"},
         "COP": None,
         "P66": {"brand": "Phillips 66", "brand_wikidata": "Q1656230"},
