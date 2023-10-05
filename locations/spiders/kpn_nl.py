@@ -1,5 +1,6 @@
 import scrapy
 
+from locations.categories import Categories, apply_category
 from locations.hours import DAYS_NL, OpeningHours
 from locations.items import Feature
 
@@ -24,7 +25,7 @@ class KpnNLSpider(scrapy.Spider):
                 close = store.get(f"{day.lower()}_dicht")
                 oh.add_range(day=DAYS_NL.get(day), open_time=open, close_time=close, time_format="%H:%M")
             coordinates = store.get("locatie")
-            yield Feature(
+            item = Feature(
                 {
                     "ref": store.get("winkelnummer"),
                     "name": store.get("formulenaam"),
@@ -41,3 +42,5 @@ class KpnNLSpider(scrapy.Spider):
                     "opening_hours": oh,
                 }
             )
+            apply_category(Categories.SHOP_MOBILE_PHONE, item)
+            yield item
