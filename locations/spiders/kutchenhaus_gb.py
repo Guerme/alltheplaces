@@ -1,5 +1,6 @@
 from scrapy.spiders import SitemapSpider
 
+from locations.categories import apply_category
 from locations.items import Feature
 
 
@@ -24,5 +25,7 @@ class KutchenhausGBSpider(SitemapSpider):
         item["addr_full"] = response.xpath('//div[@class="store-details--info-item col-10"]/text()').getall()[0].strip()
         item["phone"] = response.xpath('//div[@class="store-details--info-item col-10"]/a/text()').get()
         item["ref"] = item["website"] = response.url
+
+        apply_category({"shop": "kitchen"}, item)
 
         return item
