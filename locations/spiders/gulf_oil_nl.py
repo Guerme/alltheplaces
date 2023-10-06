@@ -1,5 +1,6 @@
 import scrapy
 
+from locations.categories import Categories, apply_category
 from locations.hours import OpeningHours, sanitise_day
 from locations.items import Feature
 
@@ -32,7 +33,7 @@ class GulfOilNLSpider(scrapy.Spider):
 
                 oh.add_range(day=sanitise_day(day), open_time=open_time, close_time=close_time, time_format="%H:%M")
 
-        yield Feature(
+        item = Feature(
             {
                 "ref": store_info.get("id"),
                 "name": store_info.get("name"),
@@ -48,3 +49,7 @@ class GulfOilNLSpider(scrapy.Spider):
                 "opening_hours": oh,
             }
         )
+
+        apply_category(Categories.FUEL_STATION, item)
+
+        yield item
