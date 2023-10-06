@@ -8,7 +8,7 @@ class GulfOilNLSpider(scrapy.Spider):
     name = "gulf_oil_nl"
     start_urls = ["http://www.gulftankstationsenviemretail.nl/wp-content/themes/gulf-stations/gulf-map/json.php"]
 
-    item_attributes = {"brand": "Gulf Oil", "brand_wikidata": "Q1296860"}
+    item_attributes = {"brand": "Gulf Oil", "brand_wikidata": "Q5617505"}
 
     def parse(self, response, **kwargs):
         for store in response.json():
