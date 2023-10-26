@@ -7,8 +7,8 @@ from locations.hours import DAYS, OpeningHours
 from locations.items import Feature
 
 
-class TjmaxxSpider(scrapy.Spider):
-    name = "tjmaxx"
+class TjxSpider(scrapy.Spider):
+    name = "tjx"
     allowed_domains = ["tjx.com"]
 
     chains = {
