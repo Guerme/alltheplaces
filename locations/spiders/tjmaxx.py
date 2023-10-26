@@ -13,20 +13,22 @@ class TjmaxxSpider(scrapy.Spider):
 
     chains = {
         # USA chains
-        "08": {"brand": "TJ Maxx", "brand_wikidata": "Q10860683"},
-        "10": {"brand": "Marshalls", "brand_wikidata": "Q15903261"},
+        "08": {"brand": "TJ Maxx", "brand_wikidata": "Q10860683", "country": "USA"},
+        "10": {"brand": "Marshalls", "brand_wikidata": "Q15903261", "country": "USA"},
         # Canada chains
-        "90": {"brand": "HomeSense", "brand_wikidata": "Q16844433"},
-        "91": {"brand": "Winners", "brand_wikidata": "Q845257"},
-        "93": {"brand": "Marshalls", "brand_wikidata": "Q15903261"},
+        "90": {"brand": "HomeSense", "brand_wikidata": "Q16844433", "country": "Canada"},
+        "91": {"brand": "Winners", "brand_wikidata": "Q845257", "country": "Canada"},
+        "93": {"brand": "Marshalls", "brand_wikidata": "Q15903261", "country": "Canada"},
     }
 
     def start_requests(self):
+        usa_chains = [k for k in self.chains if self.chains[k]["country"] == "USA"]
+        usa_chains = str(usa_chains).replace("[", "").replace("]", "").replace("'", "").replace(" ", "")
         for lat, lon in point_locations("us_centroids_50mile_radius.csv"):
             yield scrapy.http.FormRequest(
                 url="https://marketingsl.tjx.com/storelocator/GetSearchResults",
                 formdata={
-                    "chain": "08,10",
+                    "chain": usa_chains,
                     "lang": "en",
                     "maxstores": "100",
                     "geolat": lat,
@@ -35,11 +37,13 @@ class TjmaxxSpider(scrapy.Spider):
                 headers={"Accept": "application/json"},
             )
 
+        can_chains = [k for k in self.chains if self.chains[k]["country"] == "Canada"]
+        can_chains = str(can_chains).replace("[", "").replace("]", "").replace("'", "").replace(" ", "")
         for lat, lon in point_locations("ca_centroids_100mile_radius.csv"):
             yield scrapy.http.FormRequest(
                 url="https://marketingsl.tjx.com/storelocator/GetSearchResults",
                 formdata={
-                    "chain": "90,91,93",
+                    "chain": can_chains,
                     "lang": "en",
                     "maxstores": "100",
                     "geolat": lat,
