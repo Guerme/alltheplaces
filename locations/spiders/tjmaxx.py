@@ -19,6 +19,9 @@ class TjxSpider(scrapy.Spider):
         "90": {"brand": "HomeSense", "brand_wikidata": "Q16844433", "country": "Canada"},
         "91": {"brand": "Winners", "brand_wikidata": "Q845257", "country": "Canada"},
         "93": {"brand": "Marshalls", "brand_wikidata": "Q15903261", "country": "Canada"},
+        # These brands are pulled in separate spiders from separate websites that provide better data
+        "28": {"brand": "Homegoods"},
+        "50": {"brand": "Sierra"},
     }
 
     countries = {"Canada": "ca_centroids_100mile_radius.csv", "USA": "us_centroids_50mile_radius.csv"}
