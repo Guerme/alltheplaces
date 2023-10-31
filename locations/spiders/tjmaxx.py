@@ -21,36 +21,24 @@ class TjxSpider(scrapy.Spider):
         "93": {"brand": "Marshalls", "brand_wikidata": "Q15903261", "country": "Canada"},
     }
 
-    def start_requests(self):
-        usa_chains = [k for k in self.chains if self.chains[k]["country"] == "USA"]
-        usa_chains = str(usa_chains).replace("[", "").replace("]", "").replace("'", "").replace(" ", "")
-        for lat, lon in point_locations("us_centroids_50mile_radius.csv"):
-            yield scrapy.http.FormRequest(
-                url="https://marketingsl.tjx.com/storelocator/GetSearchResults",
-                formdata={
-                    "chain": usa_chains,
-                    "lang": "en",
-                    "maxstores": "100",
-                    "geolat": lat,
-                    "geolong": lon,
-                },
-                headers={"Accept": "application/json"},
-            )
+    countries = {"Canada": "ca_centroids_100mile_radius.csv", "USA": "us_centroids_50mile_radius.csv"}
 
-        can_chains = [k for k in self.chains if self.chains[k]["country"] == "Canada"]
-        can_chains = str(can_chains).replace("[", "").replace("]", "").replace("'", "").replace(" ", "")
-        for lat, lon in point_locations("ca_centroids_100mile_radius.csv"):
-            yield scrapy.http.FormRequest(
-                url="https://marketingsl.tjx.com/storelocator/GetSearchResults",
-                formdata={
-                    "chain": can_chains,
-                    "lang": "en",
-                    "maxstores": "100",
-                    "geolat": lat,
-                    "geolong": lon,
-                },
-                headers={"Accept": "application/json"},
-            )
+    def start_requests(self):
+        for country, file in self.countries.items():
+            chains = [k for k in self.chains if self.chains[k]["country"] == country]
+            chains = str(chains).replace("[", "").replace("]", "").replace("'", "").replace(" ", "")
+            for lat, lon in point_locations(file):
+                yield scrapy.http.FormRequest(
+                    url="https://marketingsl.tjx.com/storelocator/GetSearchResults",
+                    formdata={
+                        "chain": chains,
+                        "lang": "en",
+                        "maxstores": "100",
+                        "geolat": lat,
+                        "geolong": lon,
+                    },
+                    headers={"Accept": "application/json"},
+                )
 
     def parse_hours(self, hours):
         try:
